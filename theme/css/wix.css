@@ -1,0 +1,118 @@
+
+.pinkball {
+    -webkit-animation: MyAnimation 3s infinite;
+    width: 30px;
+    height: 30px;
+    background: black;
+    position: absolute;
+    -webkit-transform: translateZ(0);
+    border-radius: 50px;
+}
+
+@-webkit-keyframes MyAnimation {
+    from {
+        left: 100px;
+    }
+    50% {
+        background: #FF0050;
+    }
+    to {
+        left: 300px;
+    }
+}
+
+#scope1 {
+    position: absolute;
+    left: 64px;
+    top: 120px;
+    width: 360px;
+    border: solid orange 4px;
+    height: 192px;
+
+
+}
+#scope2 {
+    position: absolute;
+    left: 74px;
+    top: 205px;
+    width: 340px;
+    border: solid green 4px;
+    height: 82px;
+}
+
+
+
+
+
+#layers_center {
+    position: absolute;
+    left: 200px;
+    top: 50%;
+    margin-top: -150px;
+}
+#layers_wrapper {
+    -webkit-transform-style: preserve-3d;
+    -webkit-transition: -webkit-transform 0.5s;
+    -webkit-transform: rotateX(0deg);
+    position: relative;
+}
+
+#layers_desc {
+    position: absolute;
+    left: 500px;
+    top: 0;
+    opacity: 0;
+    -webkit-transition: opacity 0.5s;
+    width: 300px;
+}
+
+#layers_desc.show {
+    opacity: 1;
+}
+
+#layers_wrapper > div {
+    width: 400px;
+    height: 200px;
+    position: absolute;
+    left: 50px;
+    top: 50px;
+    box-shadow: black 0 0 10px 0;
+}
+
+#layers_wrapper.rotate {
+    -webkit-transform: rotateX(65deg) rotateZ(10deg) translate3d(0,50px,0);
+}
+
+#layers_wrapper.rotate #layers_layer_2 {
+    -webkit-transform: translate3d(0,0,-150px);
+}
+
+#layers_wrapper.rotate #layers_layer_3 {
+    -webkit-transform: translate3d(0,0,-75px);
+}
+
+#layers_wrapper.rotate #layers_layer_3.moved{
+    -webkit-transform: translate3d(50px,0,-75px);
+}
+
+#layers_layer_2 {
+    background: transparent url('../../images/layers_anim_1.png') center center no-repeat;
+    -webkit-transition: -webkit-transform 0.5s 0.5s;
+    z-index: 1;
+}
+
+#layers_layer_3.moved {
+    -webkit-transform: translate3d(50px,0,0);
+}
+
+#layers_layer_3 {
+    background: transparent url('../../images/layers_anim_2.png') center center no-repeat;
+    -webkit-transition: -webkit-transform 0.5s 0.5s;
+    z-index: 2;
+}
+
+#layers_layer_1 {
+    background: transparent url('../../images/layers_anim_3.png') center center no-repeat;
+    -webkit-transform: translate3d(0,0,0);
+    z-index: 3;
+}

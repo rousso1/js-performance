@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+<script>
+    function addStuff(one, two) {
+        return one + two;
+    }
+
+    window.setTimeout(function(){
+        console.log('start adding numbers');
+
+        for(var i=0;i<100000;i++) {
+            addStuff(1, 2);
+        }
+    }, 1000);
+</script>
+</body>
+</html>

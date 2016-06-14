@@ -1,0 +1,21 @@
+## What this code does?
+
+This code consumes huge JSON file (one in data.js file) and renders nice timeline in the DOM.
+
+## What needs to be improved?
+
+Page loading time - it takes forever!
+
+## How should I work with this code?
+
+You are submitting contents of the main.js and main.css, everything that you'll do outside these two files won't matter.
+
+In the main.js file you should NOT change:
+- ID of the DOM element 'timeline_list'
+- fact that under #timeline_list there are 1501 children elements
+
+Make sure that output looks exactly the same after your changes!
+
+## How HackaTester will test my code?
+
+HackaTester will measure the time it takes for page to fully render. Then, it will check if element with ID 'timeline_list' has 1501 children. It's a simple type of validation.

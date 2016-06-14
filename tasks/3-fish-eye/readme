@@ -1,0 +1,21 @@
+## What this code does?
+
+This code creates a fish-eye effect on the list of randomly generated users.
+
+## What needs to be improved?
+
+FPS rate for animation. Now it's under 30FPS!
+
+## How should I work with this code?
+
+You are submitting contents of the main.js, everything that you'll do outside this file won't matter.
+
+In the main.js file you should NOT change:
+- ID of the DOM element 'people'
+- fact that under #people there are 40 child elements
+
+Make sure that output looks exactly the same after your changes!
+
+## How HackaTester will test my code?
+
+HackaTester will measure how fast your code is able to deliver frames when user is scrolling. It will also check if element with ID 'people' has 40 children. It's a simple type of validation.

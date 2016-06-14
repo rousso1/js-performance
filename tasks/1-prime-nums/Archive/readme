@@ -1,0 +1,17 @@
+## What this code does?
+
+This fine piece of code calculates nth prime numbers for given indexes.
+
+## How should I work with this code?
+
+You are submitting only contents of the main.js file, so everything that you'll do outside this file won't matter.
+
+In the main.js file you should NOT change:
+- name of the class (Primes)
+- name of the public method (getPrime)
+
+Your code should work for ALL possible input values (not only for the provided example).
+
+## How HackaTester will test my code?
+
+HackaTester will run your code in the similar fashion it's being used in the index.html file. It will use different indexes though.

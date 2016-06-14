@@ -1,0 +1,19 @@
+## What this code does?
+
+This code runs a Rambo Lady animation.
+
+## What needs to be improved?
+
+Memory consumption. Current code triggers garbage collection every couple of seconds and is bloating memory.
+
+## How should I work with this code?
+
+You are submitting contents of the main.js, everything that you'll do outside this file won't matter.
+
+In the main.js file you should NOT change names of the existing classes and methods.
+
+Make sure that output looks exactly the same after your changes!
+
+## How HackaTester will test my code?
+
+HackaTester will measure memory consumption of your animation.

@@ -1,0 +1,5 @@
+- all css changes to css file
+- innerHTML to innerText
+- variable caching
+- relative positioning of the dots
+- one event handler instead of multiple handlers

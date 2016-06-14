@@ -1,0 +1,52 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#wrapper {
+    position: relative;
+    padding: 15px;
+    background: #efefef;
+}
+
+#people {
+    list-style-type: none;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+    width: 300px;
+}
+
+#people li {
+    position: relative;
+    height: 50px;
+    margin-bottom: 6px;
+    box-shadow: black 0 0 10px 0;
+
+    /*border-top-right-radius: 5px;*/
+    /*border-bottom-right-radius: 5px;*/
+
+    background: linear-gradient(to bottom, #ffffff 0%, #f1f1f1 50%, #e1e1e1 51%, #f6f6f6 100%);
+}
+
+#people img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50px;
+    height: 50px;
+}
+
+#people .name {
+    position: absolute;
+    left: 60px;
+    top: 3px;
+    font-size: 18px;
+}
+
+#people .userName {
+    position: absolute;
+    left: 60px;
+    top: 23px;
+    color: gray;
+}

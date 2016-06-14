@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+<script>
+    var arr = [];
+
+    function createGarbage() {
+        arr.push(new Array(10000).join('x'));
+    }
+
+    window.setInterval(createGarbage, 10);
+
+    function clearGarbage() {
+        arr.shift();
+    }
+
+    window.setInterval(clearGarbage, 11);
+</script>
+</body>
+</html>

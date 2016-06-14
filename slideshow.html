@@ -1,0 +1,1188 @@
+<!--
+Google IO 2012/2013 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahé <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <!--This one seems to work all the time, but really small on ipad-->
+    <!--<meta name="viewport" content="initial-scale=0.4">-->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" media="all" href="theme/css/default.css">
+    <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+    <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+    <script src="js/jquery.js"></script>
+    <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+    <link rel="stylesheet" href="theme/css/elusive-webfont.css">
+    <!-- Making Waves specific styles -->
+    <link rel="stylesheet" href="theme/css/wix.css">
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+<!--<slide class="logoslide nobackground">-->
+<!--<article class="flexbox vcenter">-->
+<!--<span><img src="images/google_developers_logo.png"></span>-->
+<!--</article>-->
+<!--</slide>-->
+
+<slide class="title-slide segue nobackground">
+    <aside class="gdbar"><img src="images/wix_transparent.gif"></aside>
+    <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+        <h1 data-config-title style="font-size: 60px;"><!-- populated from slide_config.json --></h1>
+        <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+        <p data-config-presenter><!-- populated from slide_config.json --></p>
+    </hgroup>
+</slide>
+
+<slide>
+    <article class="flexbox vcenter">
+        <h2>http://tinyurl.com/wix-perf</h2>
+    </article>
+</slide>
+
+<slide>
+    <article class="flexbox vcenter auto-fadein">
+        <h2>Why should we care about performance?</h2>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Performance is critical</h2>
+    </hgroup>
+    <article>
+        <ul>
+            <li>User Experience:<ul>
+                <li>< 300ms - snappy and happy</li>
+                <li>1s+ - waiting</li>
+                <li>10s - I give up</li>
+            </ul></li>
+            <li>SEO penalty for slow sites</li>
+            <li>Your competitors care, hence so should you</li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Unfortunately, DOM and JS were not created with big apps in mind</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+        <a href="http://info.cern.ch/hypertext/WWW/TheProject.html">
+            <img src="images/the-project.png" alt="The WWW Project" title="First html page" style="margin-top: -60px; width: 760px; height: auto;">
+        </a>
+        <footer class="source"><a href="http://info.cern.ch/hypertext/WWW/TheProject.html">TheProject</a></footer>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2 class="flexbox vcenter">Yet, here we are</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+        <img src="images/wix-editor.png" alt="Wix editor" title="Wix Editor" style="margin-top: -60px; width: 910px; height: auto;">
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Webapps are much more than JS:</h2>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>Network</li>
+            <li>Parsing</li>
+            <li>Rendering</li>
+            <li>Painting</li>
+            <li>Scripting</li>
+            <li>Accessing APIs</li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Agenda</h2>
+    </hgroup>
+    <article>
+        <ul>
+            <li><a href="#10">Javascript Execution</a></li>
+            <li><a href="#27">DOM access & page rendering process</a></li>
+            <li><a href="#39">Animations</a></li>
+            <li><a href="#59">Garbage collection</a></li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>Each Step</h2>
+    </hgroup>
+    <article>
+        <ul class="build">
+            <li>Quick Theory - Understanding the rules</li>
+            <li>Tools - Finding bottlenecks, measuring improvements</li>
+            <li>Exercise - Put knowledge into practice</li>
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <h2>We will focus on V8</h2>
+    <ul style="margin-top: 40px">
+        <li>What i am most familiar with</li>
+        <li>Most documented on the web</li>
+        <li>Most browser's internal principals are similar.</li>
+        </ul>
+            <table>
+                <tr>
+                    <th></th>
+                    <th>Chrome</th>
+                    <th>Firefox</th>
+                    <th>IE</th>
+                    <th>Edge</th>
+                    <th>Safari</th>
+                    <th>Opera</th>
+                    <th>Node.js</th>
+                </tr>
+                <tr>
+                    <td>Javascript Engine</td>
+                    <td>V8</td>
+                    <td>SpiderMonkey</td>
+                    <td>Chakra (JScript)</td>
+                    <td>Chakra (JScript)</td>
+                    <td>Nitro (JavaScriptCore)</td>
+                    <td>V8</td>
+                    <td>V8</td>
+                </tr>
+                <tr>
+                    <td>Rendering Engine</td>
+                    <td>Blink (Webkit)</td>
+                    <td>Gecko</td>
+                    <td>Tridnet</td>
+                    <td>EdgeHTML (Tridnet)</td>
+                    <td>Webkit</td>
+                    <td>Webkit</td>
+                    <td>-</td>
+                </tr>
+            </table>
+
+</slide>
+
+<slide>
+    <article class="flexbox vcenter auto-fadein">
+        <h2>Optimizing raw Javascript?</h2>
+    </article>
+</slide>
+
+<slide>
+    <h2>The Flexibility of JavaScript</h2>
+
+    <ul style="margin-top: 40px;">
+        <li>Dynamic scripting language</li>
+        <li>Properties and methods can be added/removed to objects on the fly</li>
+        <li>Dynamic typing</li>
+    </ul>
+</slide>
+
+<slide>
+    <h2>Hidden classes</h2>
+
+        <pre class="prettyprint" data-lang="javascript" style="margin-top:40px;">
+<span class="kwd">function</span><span class="pln"> </span><span class="typ">Point</span><span class="pun">(</span><span class="pln">x</span><span class="pun">,</span><span class="pln"> y</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    </span><span class="kwd">this</span><span class="pun">.</span><span class="pln">x </span><span class="pun">=</span><span class="pln"> x</span><span class="pun">;</span><span class="pln">
+    </span><span class="kwd">this</span><span class="pun">.</span><span class="pln">y </span><span class="pun">=</span><span class="pln"> y</span><span class="pun">;</span><span class="pln">
+</span><span class="pun">}</span><span class="pln">
+
+</span><span class="kwd">var</span><span class="pln"> a </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> </span><span class="typ">Point</span><span class="pun">(</span><span class="lit">11</span><span class="pun">,</span><span class="lit">12</span><span class="pun">);</span><span class="pln">
+</span><span class="kwd">var</span><span class="pln"> b </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> </span><span class="typ">Point</span><span class="pun">(</span><span class="lit">33</span><span class="pun">,</span><span class="lit">44</span><span class="pun">);</span></pre>
+    <div class="build">
+        <pre class="prettyprint to-build"><span class="pln">b</span><span class="pun">.</span><span class="pln">z </span><span class="pun">=</span><span class="pln"> </span><span class="lit">55</span><span class="pun">;</span> //creates another class</pre>
+    </div>
+    <div class="slideshow" style="position: absolute; right: 50px; top: 0">
+        <p><button style="float:right;z-index: 100;">&gt;</button><button style="float:right;z-index: 100;">&lt;</button></p>
+        <img src="images/hidden-classes/point-1.png">
+        <img src="images/hidden-classes/point-2.png">
+        <img src="images/hidden-classes/point-3.png">
+        <img src="images/hidden-classes/point-4.png">
+        <img src="images/hidden-classes/point-5.png">
+        <img src="images/hidden-classes/point-6.png">
+        <img src="images/hidden-classes/point-7.png">
+    </div>
+    <footer class="source">
+        <a href="http://www.youtube.com/watch?v=UJPdhx5zTaw">Breaking the JavaScript Speed Limit with V8</a>
+        <a href="https://developers.google.com/v8/design?hl=en">V8 Design principals</a>
+    </footer>
+</slide>
+
+<slide>
+    <h2>Conclusion</h2>
+
+    <ul style="margin-top:40px;">
+        <li>Initialize properties and methods in constructor functions</li>
+        <li>Do it always in the same order</li>
+    </ul>
+</slide>
+
+<slide>
+    <h2>JIT - Just In Time</h2>
+    <article style="margin-top: 40px;">
+        <ul>
+            <li>Modern Javascript runtime engines use compilation</li>
+            <li>Javascript is compiled directly to the machine code</li>
+            <li>V8 (Chrome's Javascript) has two different Just-In-Time (JIT) compilers:<ul>
+                <li>"Full" compiler, which can generate good code for any Javascript</li>
+                <li>Optimizing compiler, which produces great code for most Javascript, but takes longer to compile.</li>
+            </ul></li>
+
+        </ul>
+    </article>
+</slide>
+
+<slide>
+    <h2>The "Full" Compiler</h2>
+    <ul class="build" style="margin-top: 25px;">
+        <li>Can process any JS code</li>
+        <li>Fast, starts executing ASAP</li>
+        <li>Generates good (but not great) code</li>
+        <li>Creates Inline Caches (ICs) to refine knowledge about types while the program runs</li>
+        <li>When the code runs, it will validate type assumptions first, then use the inline cache to shortcut the operation</li>
+    </ul>
+</slide>
+
+<slide>
+    <h2>The Optimizing Compiler</h2>
+
+    <ul class="build" style="margin-top: 25px;">
+        <li>Re-compiles "hot" functions (functions that are run many times)</li>
+        <li>Uses type feedback to make the compiled code faster (by using the ICs)</li>
+        <li>Speeds execution by placing operations inline - directly where they are called</li>
+        <li>Slower, but produces great code</li>
+        <li>Can't process some language features</li>
+        <li>Speculative optimization - sometimes it doesn't work out, and deoptimization occurs</li>
+    </ul>
+</slide>
+<slide>
+    <h2>Look out for the bail-outs!</h2>
+    <h3>Features which are (currently) not supported by the Optimizing compiler</h3>
+    <ul style="margin-top: 40px;">
+        <li>for-in loops</li>
+        <li><code>try{}catch(){}</code></li>
+        <li><code>eval</code></li>
+        <li><code>debugger</code></li>
+        <li>changing or passing <code>arguments</code></li>
+        <li><code>switch</code> with mixed strings and numbers</li>
+        <li>more...</li>
+    </ul>
+
+    <h3>
+        <a href="demos/bailout/index.html" class="demo abs" style="border: none;">
+            <img src="images/paperclip.png" style="height:auto; width: 50px; border:0;"/>
+        </a>
+    </h3>
+
+    <footer class="source">
+        <a href="http://www.html5rocks.com/en/tutorials/speed/v8/">Performance Tips for V8</a>
+    </footer>
+</slide>
+
+<slide>
+    <h2>Monomorphic <code class="red3">vs</code> Polimorphic functions</h2>
+
+    <div class="build">
+            <pre data-lang="javascript" class="prettyprint">function add(x, y) {
+    return x + y;
+}
+
+add(1, 2);      // + in add is monomorphic</pre>
+        <pre class="prettyprint">add("a", "b");  // + in add becomes polymorphic</pre>
+    </div>
+
+    <!--<a href="../demos/monomorphic/index.html" class="demo abs"><i class="icon-paper-clip"></i> (canary)</a>-->
+</slide>
+
+<slide>
+    <h2>Reusing functions</h2>
+
+    <div class="build" style="margin-top: 40px;">
+            <pre class="prettyprint" data-lang="javascript">//Don't:
+setTimeout(function(){}, 10);</pre>
+            <pre class="prettyprint" data-lang="javascript">//Do:
+function doStuff() {}
+setTimeout(doStuff, 10);</pre>
+    </div>
+</slide>
+
+<slide>
+    <h2>Scope chain, caching variables</h2>
+
+        <pre class="prettyprint" data-lang="javascript" style="margin-top: 16px;">var result = 5;
+
+function doStuff() {
+    for(var i=0; i<10; i++) {
+        result *= 10;
+    }
+}</pre>
+    <style>
+        #scope1 {
+            position: absolute;
+            left: 48px;
+            top: 110px;
+            width: 360px;
+            border: solid #FFA500 4px;
+            height: 192px;
+        }
+        #scope2 {
+            position: absolute;
+            left: 60px;
+            top: 192px;
+            width: 340px;
+            border: solid #008000 4px;
+            height: 82px;
+        }
+    </style>
+    <div class="build">
+        <div id="scope1"></div>
+        <div id="scope2"></div>
+    </div>
+    <a href="demos/scope-chain/index.html" class="demo abs" style="border: none;"><i class="icon-paper-clip"></i></a>
+    <footer class="source">
+        <a href="http://docstore.mik.ua/orelly/webprog/jscript/ch04_07.htm">Javascript - The Definitive Guide</a>
+    </footer>
+</slide>
+
+<slide>
+    <h2>Arrays</h2>
+    <p style="margin-top: 40px;">V8 has two types of Arrays:</p>
+    <ul class="build" style="margin-top: 40px;">
+        <li>Fast elements<ul class="build">
+            <li>Linear storage buffer</li>
+            <li>Compact set of keys</li>
+            <li>Fast and Efficient access</li>
+            <li>starts at 0</li>
+        </ul></li>
+        <li>Dictionary:<ul class="build">
+            <li>Hash Table</li>
+            <li>Sparse (not every element inside is present)</li>
+            <li>Compact, but more expenssive at runtime</li>
+        </ul></li>
+    </ul>
+</slide>
+
+
+<slide>
+    <h2>Arrays</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>How to use fast elements: <ul class="build">
+            <li style="font-size: 80%;">don't make holes
+                    <pre class="smaller prettyprint">var arr = [];
+arr[2] = 10;</pre>
+                                        <pre class="smaller prettyprint">var arr = [];
+arr.push(10);</pre>
+            </li>
+            <li style="font-size: 80%;">don't mix stuff<pre class="smaller prettyprint">arr[0] = 1;
+arr[1] = 'string';</pre ></li>
+            <li style="font-size: 80%;">don't touch not existing elements<pre class="smaller prettyprint">
+var result = arr[1000] * 2;</pre></li>
+        </ul></li>
+    </ul>
+</slide>
+
+<slide>
+    <h2>Arrays</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li style="font-size: 80%;">don't delete elements (it makes the array sparse)
+            <pre class="smaller prettyprint">delete arr[12];</pre>
+        </li>
+    </ul>
+</slide>
+
+<slide>
+    <hgroup>
+        <h2>You can measure better than that...</h2>
+        <h3>User Timing API - High Resolution Time</h3>
+    </hgroup>
+    <article>
+      <pre class="prettyprint" data-lang="javascript">
+&lt;script type='text/javascript'&gt;
+  // regular DOMTimeStamp:
+    var myTimeStamp = new Date.now();  //  1337376068250
+
+  // DOMHighResTimeStamp:
+    <b>var myTime = window.performance.now();</b>  //  20303.427000007
+&lt;/script&gt;
+</pre>
+        <style>td.browser {
+            padding: 0.3em;
+        }</style>
+        <p>High Resolution Time gives us floating point time stamps that can be accurate to microsecond resolution - a thousand times better than before.</p>
+        <table style="width: inherit; float: right; margin-top: 30px;">
+            <tr>
+                <td class="browser"><img src="images/browsers/chrome.png" style="width: 40px; height: 40px;"/></td>
+                <td class="browser"><img src="images/browsers/firefox.png" style="width: 40px; height: 40px;"/></td>
+                <td class="browser"><img src="images/browsers/ie.png" style="width: 40px; height: 40px;"/></td>
+                <td class="browser"><img src="images/browsers/safari.png" style="width: 40px; height: 40px;"/></td>
+                <td class="browser"><img src="images/browsers/android.png" style="width: 40px; height: 40px;"/></td>
+            </tr>
+            <tr>
+                <td>20.0</td>
+                <td>15.0</td>
+                <td>10.0</td>
+                <td>8</td>
+                <td>4.0</td>
+            </tr>
+        </table>
+        <footer class="source"><a href="http://www.html5rocks.com/en/tutorials/webperformance/usertiming/">html5rocks UserTimingAPI</a>
+            <a href="http://updates.html5rocks.com/2012/08/When-milliseconds-are-not-enough-performance-now">performance.now()</a></footer>
+    </article>
+</slide>
+
+<slide class="big-icon tools">
+    <h2>Tools</h2>
+
+    <ul style="margin-top: 40px;">
+        <li>console.count</li>
+        <li>console.time & console.timeEnd</li>
+        <li>JS CPU profile</li>
+        <li>Trace the V8 Compiler<pre class="prettyprint" data-lang="shell">"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+--js-flags="--trace-opt --trace-deopt --trace-bailout"</pre></li>
+    </ul>
+</slide>
+
+<slide>
+    <article  class="flexbox vcenter">
+        <h2>Exercise #1 - Prime Numbers</h2>
+    </article>
+    <a href="tasks/1-prime-nums/index.html" class="demo abs" style="border: none;">
+        <img src="images/paperclip.png" style="height:auto; width: 50px; border:0;"/>
+    </a>
+</slide>
+
+<!--
+**********************************************
+**********************************************
+**********************************************
+DOM
+**********************************************
+**********************************************
+**********************************************
+-->
+
+<slide>
+    <h2 class="vcenter flexbox">Theory - DOM access & page rendering process</h2>
+</slide>
+
+<slide>
+    <h2>From the server to the screen</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>Network</li>
+        <li>Parsing HTML, building DOM</li>
+        <li>Parsing CSS</li>
+        <li>Building render tree</li>
+        <li>Painting</li>
+    </ul>
+
+    <img src="images/render.png" style="float:right; margin-top: -40px;">
+
+    <footer class="source">
+        <a href="http://www.html5rocks.com/en/tutorials/internals/howbrowserswork/">html5rocks</a>
+    </footer>
+</slide>
+
+<slide>
+    <h2>Actions that trigger reflows & repaints</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>Adding, removing or manipulating DOM nodes</li>
+        <li>Changing style properties
+            <a href="demos/repaint-layout-composite/index.html" class="demo" style="border: none;">
+                <img src="images/paperclip.png" style="height:auto; width: 50px; border:0;"/>
+            </a>
+        </li>
+        <li>Resizing window</li>
+        <li>Changing font size</li>
+        <li>Scrolling</li>
+    </ul>
+</slide>
+
+<slide>
+    <h2>Rules - Don't change individual styles, use classes</h2>
+
+        <pre class="prettyprint" style="margin-top: 40px;" data-lang="javascript">//Don't
+node.style.background = 'green';
+node.style.color = 'red';
+node.style.padding = '10px';</pre>
+
+    <div class="build">
+<pre class="prettyprint" data-lang="javascript">//Do
+node.classList.add('highlighted');</pre>
+    </div>
+</slide>
+
+<slide>
+    <h2>Rules - hide or clone nodes before heavy modifications</h2>
+
+    <div class="build" style="margin-top: 40px;">
+            <pre class="prettyprint" data-lang="javascript">node.style.display = 'none';
+//manipulating node
+node.style.display = 'block';</pre>
+            <pre class="prettyprint" data-lang="javascript">var clone = node.cloneNode(true);
+//manipulating clone
+node.parentNode.replaceChild(clone, node);</pre>
+    </div>
+</slide>
+
+<slide>
+    <h2>Rules - Optimize adding multiple nodes</h2>
+
+    <div class="build" style="margin-top: 40px;">
+            <pre class="prettyprint" data-lang="javascript">//Don't:
+for(var i=0; i&lt;10; i++) {
+    var li = document.createElement('li');
+    document.getElementById('list').appendChild(li);
+}</pre>
+            <pre class="prettyprint" data-lang="javascript">//Do:
+var df = document.createDocumentFragment();
+for(var i=0; i&lt;10; i++) {
+    var li = document.createElement('li');
+    df.append(li);
+}
+
+document.getElementById('list').appendChild(df);</pre>
+    </div>
+</slide>
+
+<slide>
+    <h2>Rules - Cache computed styles</h2>
+
+    <div class="build" style="margin-top: 40px;">
+        <pre class="prettyprint" data-lang="javascript">//Don't:
+for(var i=0; i&lt;nodes.length; i++) {
+    nodes[i].style.top += window.scrollY;
+}</pre>
+        <pre class="prettyprint" data-lang="javascript">//Do:
+var scrollY = window.scrollY;
+for(var i=0; i&lt;nodes.length; i++) {
+    nodes[i].style.top += scrollY;
+}</pre>
+    </div>
+</slide>
+
+<slide>
+    <h2>Accessing external APIs may be expensive</h2>
+
+    <ul style="margin-top: 40px;">
+        <li>DOM</li>
+        <li>localStorage</li>
+        <li>IndexedDB</li>
+        <li>Canvas</li>
+        <li>WebGL</li>
+        <li>etc.</li>
+    </ul>
+</slide>
+
+<slide>
+    <h2>Rules - Cache nodes that you often use</h2>
+
+    <div class="build" style="margin-top: 40px;">
+            <pre class="prettyprint" data-lang="javascript">//Don't:
+$('#item').attr('alt', 'text');
+$('#item').click(doClick);
+$('#item').show();</pre>
+            <pre class="prettyprint" data-lang="javascript">//Do:
+$('#item').attr('alt', 'text')
+          .click(doClick)
+          .show();
+
+//Or:
+var $item = $('#item');
+//...</pre>
+    </div>
+</slide>
+
+<slide>
+    <h2>Rules - Attaching event listeners efficiently</h2>
+
+    <div class="build" style="margin-top: 40px;">
+<pre class="prettyprint" data-lang="html">
+&lt;div id="slideshow"&gt;
+    &lt;img src="1.png" /&gt;
+    &lt;img src="2.png" /&gt;
+    &lt;img src="3.png" /&gt;
+&lt;/div&gt;</pre>
+            <pre class="prettyprint" data-lang="javascript">//Don't:
+$('#slideshow img').click(doStuff);//3 listeners</pre>
+            <pre class="prettyprint" data-lang="javascript">//Do:
+$('#slideshow').on('click', 'img', doStuff);//1 listener</pre>
+    </div>
+</slide>
+
+<slide class="big-icon tools">
+    <h2>Tools</h2>
+
+    <ul style="margin-top: 40px;">
+        <li>Timeline events</li>
+        <li>Continous repainting<a href="demos/paint-cost/index.html" class="demo" style="border: none;">
+            <img src="images/paperclip.png" style="height:auto; width: 50px; border:0;"/>
+        </a>
+        </li>
+    </ul>
+
+</slide>
+
+<slide>
+    <div class="flexbox vcenter">
+        <h2>Exercise #2 - The Timeline</h2><br>
+        <a href="tasks/2-timeline/index.html" class="demo abs" style="border: none;">
+            <img src="images/paperclip.png" style="height:auto; width: 50px; border:0;"/>
+        </a>
+    </div>
+
+</slide>
+
+<slide>
+    <div class="flexbox vcenter">
+        <h2>Theory - Animations</h2>
+    </div>
+</slide>
+
+<slide>
+    <h2>Magical <span class="red3">60</span>FPS</h2>
+
+    <ul style="margin-top: 40px;">
+        <li>60Hz - default screen refresh rate</li>
+        <li>60FPS == smooth animation
+            <a href="demos/fps/index.html" class="demo abs" style="border: none;"><i class="icon-paper-clip"></i></a>
+        </li>
+        <li>1 sec <span class="red3">/</span> 60 frames = <span class="red3">16</span>.666666...ms per frame</li>
+        <li>No need to animate at higher frequency</li>
+        <li>in a single frame, the browser has to all the following work:<ul>
+            <li>JavaScript</li>
+            <li>Style calculations</li>
+            <li>Layout</li>
+            <li>Paint Setup & Paint, composite</li>
+        </ul></li>
+    </ul>
+    <footer class="source">
+        <a href="http://paulbakaus.com/tutorials/performance/the-illusion-of-motion/">The illusion of motion</a>
+        <a href="https://en.wikipedia.org/wiki/Phi_phenomenon">The phi phenomenon</a>
+    </footer>
+</slide>
+
+
+
+<slide>
+    <h2>The CPU and The GPU</h2>
+    <ul style="margin-top: 40px;">
+        <li>The CPU is located on the motherboard and processes (almost) everything</li>
+        <li>GPU is located on the graphics card</li>
+        <li>Responsible for processing and rendering graphics</li>
+        <li>Designed specifically for performing the complex mathematical and geometric calculations necessary for graphics rendering</li>
+        <li>Offloading operations onto the GPU can yield massive performance gains</li>
+    </ul>
+    <footer class="source"><a href="http://dev.opera.com/articles/css-will-change-property/">css will change property</a></footer>
+</slide>
+
+<slide>
+    <h2>The layering model</h2>
+    <ul style="margin-top: 40px">
+        <li>GPU acceleration relies on a layering model used by the browser as it renders a page</li>
+        <li>When certain operations (e.g 3D transforms) are performed on an element, it is moved to its own “layer”</li>
+        <li>It renders independently from the rest of the page</li>
+        <li>Later on it is composited (drawn onto the screen)</li>
+        <li>The rest of the page doesn’t have to be re-rendered if the element’s transform is the only thing that changes between frames</li>
+    </ul>
+
+</slide>
+
+
+<slide>
+    <h2>Layers and GPU</h2>
+
+    <p style="margin-top: 40px;">Layers = cheep transforms</p>
+
+    <div id='layers_center'>
+        <div id='layers_wrapper'>
+            <div id='layers_layer_1'></div>
+            <div id='layers_layer_2'></div>
+            <div id='layers_layer_3'></div>
+        </div>
+        <ul id='layers_desc'>
+            <li id="layers_move_ball">translate</li>
+            <li>rotate</li>
+            <li>scale</li>
+            <li>change opacity</li>
+        </ul>
+    </div>
+
+    <script>
+        $('#layers_wrapper').find('div').click(function(){
+            $(this).parent().toggleClass('rotate');
+            $('#layers_desc').addClass('show');
+        });
+
+        $('#layers_move_ball').click(function() {
+            $('#layers_layer_3').toggleClass('moved');
+        });
+    </script>
+
+</slide>
+
+<slide>
+    <h2>The "Null Transform Hack" | When are layers created?</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>A layer is auto-created by the browser for:<ul>
+            <li><code>video</code> element</li>
+            <li>Composite plugins: Flash / Silverlight</li>
+            <li><code>canvas</code> element</li>
+            <li>3D CSS properties / <a href="http://www.html5rocks.com/en/tutorials/filters/understanding-css/">css filters</a></li>
+            <li>element animating css opacity or transform</li>
+        </ul></li>
+        <li>Force a new layer: <code>translateZ(0)</code>, <code>transform3d(0,0,0)</code><a href="demos/layers/index.html" class="demo"><i class="icon-paper-clip"></i></a></li>
+        <li>Do not overuse! Layers take memory.</li>
+    </ul>
+
+    <footer class="source"><a href="http://aerotwist.com/blog/on-translate3d-and-layer-creation-hacks/">on translate3d and layer creation hacks</a></footer>
+
+</slide>
+
+<slide>
+    <h2>Web animations: JavaScript vs CSS</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>JS animation<span class="red3">:</span> gives full control</li>
+        <li>JS animation<span class="red3">:</span> runs on the main thread</li>
+        <li>CSS animation<span class="red3">:</span> browser is able to optimize it</li>
+        <li>CSS animation<span class="red3">:</span> hard to combine and control</li>
+    </ul>
+
+</slide>
+
+<slide>
+    <h2>CSS animation</h2>
+
+        <pre class="prettyprint" data-lang="css" style="margin-top: 40px;">.ball {
+    animation: MyAnimation 3s;
+}
+
+@keyframes MyAnimation {
+    from {
+        left: 100px;
+    }
+    50% {
+        background: #FF0050;
+    }
+    to {
+        left: 300px;
+    }
+  }</pre>
+    <div class="pinkball"></div>
+
+</slide>
+
+<slide>
+    <h2>JS animation: requestAnimationFrame</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li><pre class="prettyprint" data-lang="javascript">function animate(timestamp) {
+    //do stuff
+}
+window.setInterval(animate, 17);</pre></li>
+        <li><pre class="prettyprint" data-lang="javascript">function animate(timestamp) {
+    //do stuff
+    window.requestAnimationFrame(animate);
+}</pre></li>
+    </ul>
+    <a href="http://ie.microsoft.com/testdrive/graphics/RequestAnimationFrame/Default.html" class="demo abs"><i class="icon-paper-clip"></i></a>
+
+</slide>
+
+<slide>
+    <h2>Tell the browser that you are animating</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>Synchronizing multiple paints <span class="red3">&rsaquo;</span> better performance</li>
+        <li>Stopping invisible animations <span class="red3">&rsaquo;</span> CPU win <span class="red3">&rsaquo;</span> battery win</li>
+        <li>Don't overdraw animations <span class="red3">&rsaquo;</span> better performance</li>
+    </ul>
+
+</slide>
+
+<slide>
+    <h2>Why should i use requestAnimationFrame?</h2>
+
+    <h3 style="margin-top: 30px; line-height: 1.5;">The browser can optimize concurrent animations together into a single reflow and repaint cycle, leading to higher fidelity animation. For example, JS-based animations synchronized with CSS transitions or SVG SMIL. Plus, if you’re running the animation loop in a tab that’s not visible, the browser won’t keep it running, which means less CPU, GPU, and memory usage, leading to much longer battery life.</h3>
+
+</slide>
+
+<slide>
+    <h2>Efficient scroll based animations</h2>
+
+            <pre style="margin-top: 40px;" class="prettyprint" data-lang="javascript">//Don't:
+function onScroll() {
+    //animate stuff using window.scrollY
+}
+
+window.addEventListener('scroll', onScroll);</pre>
+
+</slide>
+
+<slide>
+    <h2>Efficient scroll based animations</h2>
+
+            <pre style="margin-top: 40px;" class="prettyprint" data-lang="javascript">//Do:
+function animate() {
+    //animate stuff using lastScrollY
+    window.requestAnimationFrame(animate);
+}
+
+var lastScrollY;
+function onScroll() {
+    lastScrollY = window.scrollY;
+}
+
+window.addEventListener('scroll', onScroll);</pre>
+
+</slide>
+
+
+<slide>
+    <h2>The future <code><u>will-change</u></code> | bye bye layer hacks...</h2>
+
+    <ul style="margin-top: 40px;">
+        <li><code>translateZ</code> was long used to promote elements to their own layers</li>
+        <li>Forces a 3d layer onto the GPU, for an element which may not be animated</li>
+        <li>Takes up memory in system RAM and on the GPU (particularly limited on mobile devices)</li>
+        <li>Must make sure that hardware-accelerating your operation will really help the performance</li>
+    </ul>
+
+    <footer class="source"><a href="http://aerotwist.com/blog/bye-bye-layer-hacks/">bye bye layer hacks</a></footer>
+
+</slide>
+
+<slide>
+    <h2 class="vcenter flexbox">What you really want, is to say to the browser:<br><br>
+        "Hey, this element is going to change, so kind of bear that in mind when you paint it"</h2>
+</slide>
+
+<slide>
+    <h2>Css <code><u>will-change</u></code> property</h2>
+        <h3>A new CSS property has been introduced : 'will-change'</h3>
+    <h3>Relatively new: <a href="http://dev.w3.org/csswg/css-will-change/">Module Level 1 - Editor’s Draft, 14 June 2014</a></h3>
+    <ul>
+        <li>Informs the browser ahead of time what changes are likely to be made to an element</li>
+        <li>Allows the browser to optimize the element handling ahead of time</li>
+        <li>Performing potentially-expensive work preparing for an expensive operation (e.g. animation) before it actually begins</li>
+    </ul>
+    <footer class="source"><a href="http://dev.w3.org/csswg/css-will-change/">CSS Will Change Module Level 1 - Editor’s Draft, 14 June 2014</a></footer>
+</slide>
+
+<slide>
+    <h2><code><u>will-change</u></code> property</h2>
+<h3 style="margin-top: 40px;">
+    Simply add <code>will-change</code> to the element that you’re expecting to be transformed, to hint the browser about an upcoming transformation:
+</h3>
+    <pre class="prettyprint" data-lang="css">will-change: transform;</pre>
+    <h3>Or to multiple properties:</h3>
+    <pre class="prettyprint" data-lang="css">will-change: transform, opacity;</pre>
+    <h3>preferably set the will-change property just before the change (e.g add onHover, before onClick occurs)</h3>
+    <footer class="source"><a href="http://dev.opera.com/articles/css-will-change-property/">css will change property</a></footer>
+</slide>
+<slide>
+    <h2><code>will-change</code> | browser support</h2>
+    <table style="margin-top: 40px;">
+        <tr>
+            <td class="browser"><img src="images/browsers/chrome.png" style="width: 40px; height: 40px;"/></td>
+            <td class="browser"><img src="images/browsers/firefox.png" style="width: 40px; height: 40px;"/></td>
+            <td class="browser"><img src="images/browsers/ie.png" style="width: 40px; height: 40px;"/></td>
+            <td class="browser"><img src="images/browsers/safari.png" style="width: 40px; height: 40px;"/></td>
+            <td class="browser"><img src="images/browsers/opera.png" style="width: 40px; height: 40px;"/></td>
+        </tr>
+        <tr>
+            <td>36</td>
+            <td>36</td>
+            <td><a href="http://status.modern.ie/csswillchange">"Under consideration"</a></td>
+            <td style="width: 160px;">-</td>
+            <td>24</td>
+        </tr>
+    </table>
+</slide>
+
+
+<slide>
+    <h2>Tools</h2>
+
+    <ul style="margin-top: 40px;">
+        <li>Timeline frames</li>
+        <li>Paint rectangles</li>
+        <li>Composited layer borders</li>
+    </ul>
+
+    <a href="tasks/3-fish-eye/index.html" class="demo"><i class="icon-paper-clip"></i></a>
+
+</slide>
+
+
+
+<slide>
+    <div class="vcenter flexbox">
+        <h2>Exercise #3 - Fish Eye List</h2>
+        <a href="tasks/3-fish-eye/index.html" class=""><i class="icon-paper-clip"></i></a>
+    </div>
+</slide>
+
+
+<!--
+  **********************************************
+  **********************************************
+  **********************************************
+  GC
+  **********************************************
+  **********************************************
+  **********************************************
+  -->
+
+<slide id="gc">
+    <div class="vcenter flexbox">
+        <h2>Theory - Garbage collection</h2>
+    </div>
+</slide>
+
+<slide>
+    <h2>Manual memory management</h2>
+
+    <ul  style="margin-top: 40px;">
+        <li>A Programmer is responsible for cleaning up</li>
+        <li>Easy to forget about something</li>
+        <li>As a result, apps were getting slower and was finally killed by OS</li>
+    </ul>
+</slide>
+
+<slide>
+    <h2>Automatic memory management</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>Memory is reclaimed automatically</li>
+        <li><img src="images/gc-1.png" class="center" /></li>
+    </ul>
+    <footer class="source"><a href="http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/">html5rocks.com</a></footer>
+</slide>
+
+    <slide>
+        <h2>Efficient Garbage Collection</h2>
+        <h3 class="build" style="margin-top: 30px; line-height: 1.5;">To ensure fast object allocation, short garbage collection pauses, and no memory fragmentation V8 employs a stop-the-world, generational, accurate, garbage collector.</h3>
+        <ul class="build" style="margin-top: 30px;">
+            <li>stops program execution when performing a garbage collection cycle</li>
+            <li>processes only part of the object heap in most garbage collection cycles. This minimizes the impact of stopping the application</li>
+            <li>always knows exactly where all objects and pointers are in memory. This avoids falsely identifying objects as pointers which can result in memory leaks</li>
+        </ul>
+        <footer class="source"><a href="https://developers.google.com/v8/design?hl=en">html5rocks.com</a></footer>
+    </slide>
+
+
+<slide>
+    <h2>But how does GC work?</h2>
+
+    <img src="images/gc-2.png" class="center" style="margin-top: 40px;"/>
+
+    <footer class="source"><a href="http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/">html5rocks.com</a></footer>
+</slide>
+
+<slide>
+    <h2>GC interruptions</h2>
+
+        <pre class="prettyprint" data-lang="javascript">var a = new Object();
+//do some work with a
+a = null;
+var b = new Object();</pre>
+    <img src="images/saw-tooth.png" class="center" style="width:100%"/>
+</slide>
+
+<slide>
+    <h2>Object Pools - recycling</h2>
+
+        <pre style="margin-top: 40px;" class="prettyprint" data-lang="javascript">var a = ObjectPool.get();
+//do some work with a
+ObjectPool.free(a);
+var b = ObjectPool.get();</pre>
+    <img src="images/flat.png" class="center" style="width:100%"/>
+</slide>
+
+<slide>
+    <h2>GC pauses</h2>
+    <ul style="margin-top: 40px;">
+        <li>When GC occurs, all other activity on the main thread is stopped</li>
+        <li>GC is unpredictable (from a developer point of view)</li>
+        <li>Avoid long expensive GC pauses by avoiding object creation</li>
+        <li>Reuse objects inside your loops and animation callbacks</li>
+        <li>The less the garbage collector has to pick up, the less likely you are to be hit by the "GC Tax"</li>
+    </ul>
+
+    <footer class="source"><a href="http://calendar.perfplanet.com/2013/the-runtime-performance-checklist/">the runtime performance checklist</a></footer>
+</slide>
+
+<slide class="big-icon tools">
+    <h2>Tools</h2>
+
+    <ul style="margin-top: 40px;">
+        <li>Timeline memory</li>
+        <li>Memory allocation profile</li>
+        <li>Heap snapshots</li>
+    </ul>
+
+    <a href="demos/GC/index.html" class="demo"><i class="icon-paper-clip"></i></a>
+</slide>
+
+<slide>
+    <div class="vcenter flexbox">
+        <h2>Exercise #4 - Rambo Lady</h2>
+        <a href="tasks/4-garbage/index.html" class=""><i class="icon-paper-clip"></i></a>
+    </div>
+</slide>
+
+
+
+<!--
+**********************************************
+**********************************************
+**********************************************
+End
+**********************************************
+**********************************************
+**********************************************
+-->
+
+<slide>
+    <h2>Summary</h2>
+
+    <ul class="build" style="margin-top: 40px;">
+        <li>Why performance matters?</li>
+        <li>How can we improve it?</li>
+        <li>What tools can help us to identify the bottlenecks?</li>
+    </ul>
+</slide>
+
+<slide>
+    <style>
+        ul.smaller-list li {
+            font-size: 22px;
+        }
+    </style>
+    <h2>Resources</h2>
+
+    <ul class="smaller-list" style="margin-top: 40px;">
+        <li>http://mrale.ph/v8/resources.html</li>
+        <li>http://s3.mrale.ph/nodecamp.eu</li>
+        <li>http://www.html5rocks.com/en/tutorials/speed/v8/</li>
+        <li>https://www.youtube.com/watch?v=UJPdhx5zTaw</li>
+        <li>JavaScript Performance workshop, Konrad Dzwinel, Paweł Bród, May 01, 2014</li>
+        <li>http://updates.html5rocks.com/2012/08/When-milliseconds-are-not-enough-performance-now</li>
+        <li>http://updates.html5rocks.com/tag/performance</li>
+        <li>http://www.html5rocks.com/en/tutorials/speed/high-performance-animations</li>
+        <li>http://www.html5rocks.com/en/tutorials/internals/howbrowserswork</li>
+        <li>http://docstore.mik.ua/orelly/webprog/jscript/ch04_07.htm</li>
+        <li>http://aerotwist.com/blog/on-translate3d-and-layer-creation-hacks/</li>
+        <li>http://dev.opera.com/articles/css-will-change-property/</li>
+        <li>http://aerotwist.com/blog/bye-bye-layer-hacks/</li>
+        <li>http://calendar.perfplanet.com/2013/the-runtime-performance-checklist</li>
+    </ul>
+</slide>
+
+
+<slide class="thank-you-slide segue nobackground">
+    <aside class="gdbar right"><img src="images/wix_transparent.gif"></aside>
+    <article class="flexbox vleft auto-fadein">
+        <h2>You were awesome.</h2>
+        <h2 style="margin-top: 15px;">Thank You!</h2>
+        <p style="margin-top: 100px;">Eitan Rousso<br>
+            R&D Manager - Wix.com<br>
+            <a class="" style="color:white">eitanr(at)wix.com</a><br>
+    </article>
+    <!--<p class="auto-fadein" data-config-contact>-->
+    <!-- populated from slide_config.json -->
+    </p>
+</slide>
+
+<slide class="backdrop"></slide>
+
+</slides>
+
+<script>
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-XXXXXXXX-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+
+<!--[if IE]>
+<script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+<script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+
+<script>
+    (function () {
+        //makes all links open in a separate tab/window
+        var allLinks = document.querySelectorAll('body a');
+        for (var i = 0, l = allLinks.length; i < l; i++) {
+            allLinks.item(i).setAttribute('target', '_blank');
+        }
+
+        //slideshows
+        $('.slideshow').find('img').hide();
+        $('.slideshow button:eq(0)').click(function() {
+            var slideshow = $(this).closest('.slideshow');
+            var active = slideshow.find('img.active');
+
+            if(active.length) {
+                var prev = active.prev('img');
+
+                if(prev.length) {
+                    active.removeClass('active').hide();
+                    prev.addClass('active').show();
+                }
+            }
+
+            return false;
+        });
+        $('.slideshow button:eq(1)').click(function() {
+            var slideshow = $(this).closest('.slideshow');
+            var active = slideshow.find('img.active');
+
+            if(!active.length) {
+                slideshow.find('img:eq(0)').show().addClass('active');
+            } else {
+                var next = active.next('img');
+
+                if(next.length) {
+                    active.removeClass('active').hide();
+                    next.addClass('active').show();
+                }
+            }
+
+            return false;
+        });
+    })();
+</script>
+</body>
+</html>

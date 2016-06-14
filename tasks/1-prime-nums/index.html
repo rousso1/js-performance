@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Prime numbers</title>
+</head>
+<body>
+<p>Check out the console!</p>
+<script type="text/javascript" src="main.js"></script>
+<script>
+    (function () {
+        var primes = new Primes();
+        var result;
+
+        console.log('Working...');
+
+        result = primes.getPrime(15000);
+
+        console.assert(result === 163841, 'Wrong result. Expected 163841, got ' + result + '.');
+        console.log('Result: ' + result);
+    })();
+</script>
+</body>
+</html>

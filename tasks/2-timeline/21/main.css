@@ -1,0 +1,111 @@
+#timeline {
+    width: 950px;
+    margin: 10px auto;
+    position: absolute;
+    left: 50%;
+    margin-left: -475px;
+
+}
+
+#timeline:before {
+    content: "";
+    display: block;
+    border: 3px solid #bebebe;
+    position: absolute;
+    height: 100%;
+    left: 50%;
+    margin-left: -3px;
+
+}
+
+#timeline_list {
+    padding: 0;
+    margin: 0;
+}
+
+#timeline_list > li {
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+    font-size:13px;
+    list-style:none;
+    width:450px;
+    border:1px solid #bebebe;
+    padding:15px;
+    margin:5px 0 0 0;
+    position:relative;
+}
+
+#timeline_list > li:nth-child(even) {
+    float:right;
+    clear:right;
+}
+#timeline_list > li:nth-child(odd) {
+    float:left;
+    clear:left;
+}
+
+#timeline_list > li:nth-child(even):after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 11px;
+    left: -20px;
+    width: 0;
+    height: 0;
+    border-color: transparent #fff transparent transparent;
+    border-style: solid;
+    border-width: 10px;
+}
+
+#timeline_list > li:nth-child(even):before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: -22px;
+    width: 0;
+    height: 0;
+    border-color: transparent #bebebe transparent transparent;
+    border-style: solid;
+    border-width: 11px;
+}
+
+#timeline_list > li:nth-child(odd):after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 11px;
+    right: -20px;
+    width: 0;
+    height: 0;
+    border-color: transparent transparent transparent #fff;
+    border-style: solid;
+    border-width: 10px;
+}
+
+#timeline_list > li:nth-child(odd):before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: -22px;
+    width: 0;
+    height: 0;
+    border-color: transparent transparent transparent #bebebe;
+    border-style: solid;
+    border-width: 11px;
+}
+
+#timeline_list > li time {
+    display: block;
+}
+
+#timeline .dot {
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#bebebe;
+    position:absolute;
+    left:467px;
+}

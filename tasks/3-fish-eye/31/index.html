@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Fish Eye</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+</head>
+
+<body>
+<div id='wrapper'>
+    <ul id='people'></ul>
+</div>
+
+<script src="jquery.min.js"></script>
+<script src="faker.js"></script>
+<script>
+    //Generate random people
+    var peopleList = [];
+    for (var i = 0, max = 40; i < max; i++) {
+        peopleList.push({
+            name: Faker.Name.findName(),
+            userName: Faker.Internet.userName(),
+            company: Faker.Company.companyName(),
+            phoneNumber: Faker.PhoneNumber.phoneNumber(),
+            city: Faker.Address.city,
+            picture: 'http://lorempixel.com/300/300?rnd=' + Math.random()
+        });
+    }
+
+    //Show list of people
+    var liTpl = $('<li><img><span class="name"></span><span class="userName"></span></li>');
+    var df = document.createDocumentFragment();
+
+    for (var idx in peopleList) {
+        var li = liTpl.clone(true);
+        var person = peopleList[idx];
+
+        li.data('person', person);
+        li.find('.name').text(person.name);
+        li.find('.userName').text(person.userName);
+        li.find('img').attr('src', person.picture);
+
+        df.appendChild(li.get(0));
+    }
+    $('#people').append(df);
+</script>
+<script src="main.js"></script>
+</body>
+</html>

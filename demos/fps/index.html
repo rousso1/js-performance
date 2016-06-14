@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="jquery.js"></script>
+    <script>
+        $(document).click(function() {
+            $('object:hidden').first().css('display', 'inline-block');
+        });
+    </script>
+    <style>
+        object {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<object width="240" height="320">
+    <param name="movie" value="fps-compare-15fps.swf">
+    <embed src="fps-compare-15fps.swf" width="240" height="320">
+    </embed>
+</object>
+<object width="240" height="320" style="display:none">
+    <param name="movie" value="fps-compare-30fps.swf">
+    <embed src="fps-compare-15fps.swf" width="240" height="320">
+    </embed>
+</object>
+<object width="240" height="320" style="display:none">
+    <param name="movie" value="fps-compare-60fps.swf">
+    <embed src="fps-compare-15fps.swf" width="240" height="320">
+    </embed>
+</object>
+</body>
+</html>
